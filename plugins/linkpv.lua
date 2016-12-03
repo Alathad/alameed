@@ -12,35 +12,32 @@
 ▀▄ ▄▀                                 ▀▄ ▄▀
 ▀▄▀▀▄▄▀▀▄▄▀▄▄▀▀▄▄▀▀▄▄▀▄▄▀▀▄▄▀▀▄▄▀▄▄▀▀▄▄▀▀▄▄]]
 
-local function save_value(msg, name, value)
-  if (not name or not value) then
-    return "Usage: !set var_name value"
-  end
-  local hash = nil
-  if msg.to.type == 'chat' or msg.to.type == 'channel'  then
-    hash = 'chat:'..msg.to.id..':variables'
-  end
-  if hash then
-    redis:hset(hash, name, value)
-    return "Saved "..name
-  end
-end
-local function run(msg, matches)
-  if not is_momod(msg) then
-    return "For moderators only!"
-  end
-  local name = string.sub(matches[1], 1, 50)
-  local value = string.sub(matches[2], 1, 1000)
-  local name1 = user_print_name(msg.from)
-  savelog(msg.to.id, name1.." ["..msg.from.id.."] saved ["..name.."] as > "..value )
-  local text = save_value(msg, name, value)
-  return text
+do
+
+function run(msg, matches)
+       if not is_momod(msg) then
+        return "للمدراء فقط!"
+       end
+    local data = load_data(_config.moderation.data)
+      local group_link = data[tostring(msg.to.id)]['settings']['set_link']
+       if not group_link then 
+        return "اذا المجموعة من صناعة البوت ارسل /اصنع رابط 📛 واذا لم تكن من صناعه البوت ارسل /وضع الرابط"
+       end
+         local text = "SuperGroup link  :\n"..group_link
+          send_large_msg('user#id'..msg.from.id, text.."\n", ok_cb, false)
+           return "تم ارسال رابط المجموعة الى الخاص ✔"
 end
 
 return {
   patterns = {
-   "^[#!/]save ([^%s]+) (.+)$"
-  }, 
-  run = run 
+    "^[/#!](الرابط خاص)$"
+  },
+  run = run
 }
 
+end
+
+--[[
+post by : @GOLDEN0DIVA 
+
+للمزيد من الشروحات والملفات اشترك في قناة @GOLDEN0DIVA ]]

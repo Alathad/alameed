@@ -1,4 +1,5 @@
 ﻿--[[
+
 ▀▄ ▄▀▀▄▄▀▀▄▄▀▀▄▄▀▀▄▄▀▀▄▄▀▀▄▄▀▀▄▀▄▄▀▀▄▄▀▀▄▄▀
 ▀▄ ▄▀                                 ▀▄ ▄▀
 ▀▄ ▄▀          by: #dev @MRdero       ▀▄ ▄▀  
@@ -12,40 +13,24 @@
 ▀▄ ▄▀                                 ▀▄ ▄▀
 ▀▄▀▀▄▄▀▀▄▄▀▄▄▀▀▄▄▀▀▄▄▀▄▄▀▀▄▄▀▀▄▄▀▄▄▀▀▄▄▀▀▄▄]]
 
-local function get_variables_hash(msg)
-  if msg.to.type == 'chat' or msg.to.type == 'channel' then
-    return 'chat:'..msg.to.id..':variables'
-  end
-end 
+local function run(msg, matches, callback, extra)
 
-local function get_value(msg, var_name)
-  local hash = get_variables_hash(msg)
-  if hash then
-    local value = redis:hget(hash, var_name)
-    if not value then
-      return
+local data = load_data(_config.moderation.data)
+
+local group_bye = data[tostring(msg.to.id)]['group_bye']
+
+if matches[1] == 'chat_del_user' then --For Normal Group
+    if not msg.service then 
+        return nil 
     else
-      return var_name..':\n'..value
-    end
-  end
+        return group_bye
 end
-
-local function run(msg, matches)
-  if not is_momod(msg) then -- only for mods,owner and admins
-    return 
-  end
-  if matches[2] then
-    local name = user_print_name(msg.from)
-    savelog(msg.to.id, name.." ["..msg.from.id.."] used /get ".. matches[2])-- save to logs
-    return get_value(msg, matches[2])
-  else
-    return
-  end
 end
-
+end
 return {
   patterns = {
-    "^([#!/]get) (.+)$"
+  "^!!tgservice (chat_del_user)$"
   },
-  run = run
+  run = run,
+  pre_process = pre_process
 }

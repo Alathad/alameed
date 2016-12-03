@@ -4,7 +4,7 @@
 ▀▄ ▄▀          by: #dev @MRdero       ▀▄ ▄▀  
 ▀▄ ▄▀             #dev @awose         ▀▄ ▄▀                  
 ▀▄ ▄▀           #dev @www_xnxx_c0m    ▀▄ ▄▀                
-▀▄ ▄▀                                 ▀▄ ▄▀                
+▀▄ ▄▀      @GOLDEN0DIVA                       ▀▄ ▄▀                
 ▀                 sors"alathad"       ▀▄ ▄▀
 ▀▄ ▄▀                name:            ▀▄ ▄▀ 
 ▀▄ ▄▀                                 ▀▄ ▄▀
@@ -12,40 +12,28 @@
 ▀▄ ▄▀                                 ▀▄ ▄▀
 ▀▄▀▀▄▄▀▀▄▄▀▄▄▀▀▄▄▀▀▄▄▀▄▄▀▀▄▄▀▀▄▄▀▄▄▀▀▄▄▀▀▄▄]]
 
-local function get_variables_hash(msg)
-  if msg.to.type == 'chat' or msg.to.type == 'channel' then
-    return 'chat:'..msg.to.id..':variables'
-  end
-end 
+local function run(msg, matches, callback, extra)
 
-local function get_value(msg, var_name)
-  local hash = get_variables_hash(msg)
-  if hash then
-    local value = redis:hget(hash, var_name)
-    if not value then
-      return
-    else
-      return var_name..':\n'..value
+local data = load_data(_config.moderation.data)
+
+local group_type = data[tostring(msg.to.id)]['group_type']
+
+if matches[1] and is_sudo(msg) then
+    
+data[tostring(msg.to.id)]['group_type'] = matches[1]
+        save_data(_config.moderation.data, data)
+        
+        return 'Group Type Seted To : '..matches[1]
+
+end
+if not is_owner(msg) then 
+    return 'You Are Not Allow To set Group Type !'
     end
-  end
 end
-
-local function run(msg, matches)
-  if not is_momod(msg) then -- only for mods,owner and admins
-    return 
-  end
-  if matches[2] then
-    local name = user_print_name(msg.from)
-    savelog(msg.to.id, name.." ["..msg.from.id.."] used /get ".. matches[2])-- save to logs
-    return get_value(msg, matches[2])
-  else
-    return
-  end
-end
-
 return {
   patterns = {
-    "^([#!/]get) (.+)$"
+  "^[#!/]نوع المجموعة (.*)$",
   },
   run = run
 }
+

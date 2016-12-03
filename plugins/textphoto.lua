@@ -12,35 +12,34 @@
 ▀▄ ▄▀                                 ▀▄ ▄▀
 ▀▄▀▀▄▄▀▀▄▄▀▄▄▀▀▄▄▀▀▄▄▀▄▄▀▀▄▄▀▀▄▄▀▄▄▀▀▄▄▀▀▄▄]]
 
-local function save_value(msg, name, value)
-  if (not name or not value) then
-    return "Usage: !set var_name value"
-  end
-  local hash = nil
-  if msg.to.type == 'chat' or msg.to.type == 'channel'  then
-    hash = 'chat:'..msg.to.id..':variables'
-  end
-  if hash then
-    redis:hset(hash, name, value)
-    return "Saved "..name
+do
+
+local function send_title(cb_extra, success, result)
+  if success then
+    send_msg(cb_extra[1], cb_extra[2], ok_cb, false)
   end
 end
+
 local function run(msg, matches)
-  if not is_momod(msg) then
-    return "For moderators only!"
-  end
-  local name = string.sub(matches[1], 1, 50)
-  local value = string.sub(matches[2], 1, 1000)
-  local name1 = user_print_name(msg.from)
-  savelog(msg.to.id, name1.." ["..msg.from.id.."] saved ["..name.."] as > "..value )
-  local text = save_value(msg, name, value)
-  return text
+  local eq = URL.escape(matches[1])
+
+  local url = "http://latex.codecogs.com/png.download?"
+    .."\\dpi{300}%20\\LARGE%20"..eq
+
+  local receiver = get_receiver(msg)
+  local title = "Edit LaTeX on www.codecogs.com/eqnedit.php?latex="..eq
+  send_photo_from_url(receiver, url, send_title, {receiver, title})
 end
 
 return {
+  description = "Convert LaTeX equation to image",
+  usage = {
+    "text [equation]: Convert LaTeX equation to image"
+  },
   patterns = {
-   "^[#!/]save ([^%s]+) (.+)$"
-  }, 
-  run = run 
+    "^/اكتب (.+)$"
+  },
+  run = run
 }
 
+end

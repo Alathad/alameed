@@ -1,4 +1,4 @@
-﻿--[[▀▄ ▄▀▀▄▄▀▀▄▄▀▀▄▄▀▀▄▄▀▀▄▄▀▀▄▄▀▀▄▀▄▄▀▀▄▄▀▀▄▄▀
+﻿--[▀▄ ▄▀▀▄▄▀▀▄▄▀▀▄▄▀▀▄▄▀▀▄▄▀▀▄▄▀▀▄▀▄▄▀▀▄▄▀▀▄▄▀
 ▀▄ ▄▀                                 ▀▄ ▄▀
 ▀▄ ▄▀          by: #dev @MRdero       ▀▄ ▄▀  
 ▀▄ ▄▀             #dev @awose         ▀▄ ▄▀                  
@@ -11,29 +11,20 @@
 ▀▄ ▄▀                                 ▀▄ ▄▀
 ▀▄▀▀▄▄▀▀▄▄▀▄▄▀▀▄▄▀▀▄▄▀▄▄▀▀▄▄▀▀▄▄▀▄▄▀▀▄▄▀▀▄▄]]
 
-local function run(msg, matches)
-	local data = load_data(_config.moderation.data)
-	if msg.action and msg.action.type then
-	local action = msg.action.type 
-    if data[tostring(msg.to.id)] then
-		if data[tostring(msg.to.id)]['settings'] then
-			if data[tostring(msg.to.id)]['settings']['leave_ban'] then 
-				leave_ban = data[tostring(msg.to.id)]['settings']['leave_ban']
-			end
-		end
-    end
-	if action == 'chat_del_user' and not is_momod2(msg.action.user.id) and leave_ban == 'yes' then
-			local user_id = msg.action.user.id
-			local chat_id = msg.to.id
-			ban_user(user_id, chat_id)
-		end
-	end
+do
+local function vip_team1(msg,matches)
+if is_momod(msg) and matches[1]== 'pv' and matches[2]== 'help' then
+      local help_text = tostring(_config.help_text_super)
+            send_large_msg("user#id"..msg.from.id, help_text)
+        return "Done sent a list of commands to the private !"
+      end
+        local reply_id = msg['id']
+if not is_momod(msg) then
+        local  iDev1 = 'only 4 admin'
+reply_msg(msg.id, iDev1, ok_cb, false)
+end 
 end
-
-
 return {
-  patterns = {
-    "^!!tgservice (.*)$"
-  },
-  run = run
-}
+patterns ={"^[!/#](pv) (help)$"},
+run = vip_team1 }
+end
